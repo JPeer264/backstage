@@ -25,7 +25,7 @@ import upperCase from 'lodash/upperCase';
 import upperFirst from 'lodash/upperFirst';
 import lowerFirst from 'lodash/lowerFirst';
 import { createPackageVersionProvider } from '../../version';
-import { detectPackageManager, Lockfile } from '@backstage/cli-node';
+import { detectPackageManager } from '@backstage/cli-node';
 
 const builtInHelpers = {
   camelCase,
@@ -45,13 +45,8 @@ type CreatePortableTemplaterOptions = {
 
 export class PortableTemplater {
   static async create(options: CreatePortableTemplaterOptions = {}) {
-    let lockfile: Lockfile | undefined;
-    try {
-      const pacman = await detectPackageManager();
-      lockfile = await pacman.loadLockfile();
-    } catch {
-      /* ignored */
-    }
+    const pacman = await detectPackageManager();
+    const lockfile = await pacman.loadLockfile();
 
     const versionProvider = createPackageVersionProvider(lockfile);
 
