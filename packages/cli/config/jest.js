@@ -19,6 +19,7 @@ const path = require('path');
 const crypto = require('crypto');
 const glob = require('util').promisify(require('glob'));
 const { version } = require('../package.json');
+const { detectPackageManager } = require('@backstage/cli-node');
 const paths = require('@backstage/cli-common').findPaths(process.cwd());
 
 const SRC_EXTS = ['ts', 'js', 'tsx', 'jsx', 'mts', 'cts', 'mjs', 'cjs'];
@@ -328,8 +329,8 @@ async function getRootConfig() {
     rejectFrontendNetworkRequests,
   };
 
-  const workspacePatterns =
-    rootPkgJson.workspaces && rootPkgJson.workspaces.packages;
+  const pacman = await detectPackageManager();
+  const workspacePatterns = await pacman.getMonorepoPackages();
 
   // Check if we're running within a specific monorepo package. In that case just get the single project config.
   if (!workspacePatterns || paths.targetRoot !== paths.targetDir) {
@@ -357,9 +358,7 @@ async function getRootConfig() {
   // If the target package is a workspace root, we find all packages in the
   // workspace and load those in as separate jest projects instead.
   const projectPaths = await Promise.all(
-    workspacePatterns.map(pattern =>
-      glob(path.join(paths.targetRoot, pattern)),
-    ),
+    monorepoPackages.map(pattern => glob(path.join(paths.targetRoot, pattern))),
   ).then(_ => _.flat());
 
   let projects = await Promise.all(

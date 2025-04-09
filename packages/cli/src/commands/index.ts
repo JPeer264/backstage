@@ -141,7 +141,7 @@ export function registerCommands(program: Command) {
   program
     .command('versions:check')
     .allowUnknownOption(true)
-    .action(removed("use 'yarn dedupe' or 'yarn-deduplicate' instead"));
+    .action(removed("use 'yarn dedupe'/`pnpm dedupe instead"));
   program.command('install').allowUnknownOption(true).action(removed());
   program.command('onboard').allowUnknownOption(true).action(removed());
 }

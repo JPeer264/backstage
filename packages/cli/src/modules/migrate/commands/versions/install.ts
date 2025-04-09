@@ -1,5 +1,5 @@
 /*
- * Copyright 2020 The Backstage Authors
+ * Copyright 2024 The Backstage Authors
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,23 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 import ora from 'ora';
 import chalk from 'chalk';
-import { run } from '../../../lib/run';
+import { PackageManager } from '@backstage/cli-node';
 
-export async function runYarnInstall() {
+export async function runInstall(packageManager: PackageManager) {
   const spinner = ora({
-    prefixText: `Running ${chalk.blue('yarn install')} to install new versions`,
+    prefixText: `Running ${chalk.blue(
+      `${packageManager.name()} install`,
+    )} to install new versions`,
     spinner: 'arc',
     color: 'green',
   }).start();
 
   const installOutput = new Array<Buffer>();
   try {
-    await run('yarn', ['install'], {
+    await packageManager.run(['install'], {
       env: {
         FORCE_COLOR: 'true',
+        // TODO: do we need to do this for all package managers?
         // We filter out all of the npm_* environment variables that are added when
         // executing through yarn. This works around an issue where these variables
         // incorrectly override local yarn or npm config in the project directory.
